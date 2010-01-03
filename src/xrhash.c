@@ -1,12 +1,30 @@
 #include "xrhash.h"
 
+int xr__hash_is_pointer( void * ptr )
+{
+  int ret = 0;
+  memcpy(&ret,ptr,sizeof(int));
+  return ret;
+}
+
+int xr__cmp_pointers( void * a, void * b )
+{
+  if ( a > b ){
+    return -1;
+  } else if ( a < b ){
+    return 1;
+  } 
+  return 0;
+}
+
 XRHash * xr_init_hash( hashfn hash , cmpfn cmp )
 {
   XRHash * table = NULL;
 
   if ( ( hash == NULL ) || ( cmp == NULL ) ){
-    /* no hasher or comparitor supplied! */
-    return NULL;
+    /* no hasher or comparitor supplied! just work on pointers */
+    hash = &xr__hash_is_pointer;
+    cmp  = &xr__cmp_pointers;
   }
 
   table = (XRHash*) malloc(1 * sizeof(XRHash));

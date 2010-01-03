@@ -1,1 +1,5 @@
-Library( "xrhash","xrhash.c");
+env = Environment()
+env.Append(CFLAGS="-Wall -Werror")
+env.Library( "xrhash","xrhash.c");
+
+env.Program( "xrhash-test.c",LIBS="xrhash",LIBPATH="." );
