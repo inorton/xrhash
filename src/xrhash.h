@@ -5,7 +5,10 @@
 #include <stdlib.h>
 #include <errno.h>
 
+
+#ifndef XRHASH_SLOTS
 #define XRHASH_SLOTS 8192
+#endif
 #define XRHASH_MOD   (XRHASH_SLOTS - 91)
 
 #define XRHASH_HASH_INVALID   -2 /* hashtable not initialized */

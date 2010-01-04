@@ -1,10 +1,15 @@
 #include <stdio.h>
+
+#define XRHASH_SLOTS 32768
+
 #include "xrhash.h"
 #include <assert.h>
 
 #include <sys/time.h>
 
 #define TEST_STR "foo%d"
+
+
 
 long long
 timeval_diff(struct timeval *difference,
@@ -44,7 +49,7 @@ int main( int argc, char** argv )
 
   int x = 0;
   int contains = -1;
-  int datacount = 16000;
+  int datacount = 100000;
 
   int datalen = 10 + strlen(TEST_STR); /* ten digits */
 
