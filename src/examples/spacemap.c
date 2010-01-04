@@ -1,5 +1,5 @@
 #include <ncurses.h>
-
+#include <assert.h>
 #include "spacemap.h"
 #include <string.h>
 
@@ -30,6 +30,7 @@ spacemap * spacemap_init()
 {
   spacemap * map = (spacemap*) malloc( 1 * sizeof(spacemap) );
   map->xr = xr_init_hash( &spaceship_id_hash, &spaceship_id_cmp );
+  map->selected_ship = "bob";
   return map;
 }
 
@@ -139,7 +140,16 @@ void paintships( spacemap * map, WINDOW * wind )
 
     mvwprintw( wind, shipy, shipx, "*" );
 
+    if ( strcmp( map->selected_ship, ship->name ) == 0 ){
+      wattron(wind,A_REVERSE);      
+    }
+
     mvwprintw( wind, shipy+1,shipx+1,"%s", ship->name ); 
+
+    if ( strcmp( map->selected_ship, ship->name ) == 0 ){
+      wattroff(wind,A_REVERSE);      
+    }
+
 
   }
 
@@ -171,7 +181,10 @@ int main( int argc, char** argv )
   /* setup ncurses */
   
   initscr();
+  start_color();
+
   cbreak();
+  init_pair(1,COLOR_RED, COLOR_BLACK); /* for selected ship */
 
   info_height = map_height = LINES - 2;
   map_width   = COLS - info_width - 2;

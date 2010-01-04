@@ -25,6 +25,7 @@ typedef struct spacemap {
   XRHash * xr;
   int w;
   int h;
+  char * selected_ship;
 } spacemap;
 
 #define VIPER    1
