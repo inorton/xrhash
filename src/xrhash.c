@@ -17,6 +17,38 @@ int xr__cmp_pointers( void * a, void * b )
   return 0;
 }
 
+inline int xr__get_hashcode( XRHash * xr, void * data )
+{
+  int ret = 0;
+  if ( data == NULL )
+    return XRHASH_NULL_DATA;
+
+  if ( xr == NULL )
+    return XRHASH_HASH_INVALID;
+
+  ret = (*xr->hash)( data ); 
+  
+  if ( ret <= 0 )
+    return XRHASH_HASHCODE_ERROR;
+  return ret;
+}
+
+inline int xr__get_index( XRHash * xr, int hashcode )
+{
+  int index      = 0;
+  if ( hashcode <= 0 )
+    return hashcode;
+
+  if ( xr == NULL )
+    return XRHASH_HASH_INVALID;
+
+  index = hashcode;
+  while ( index >= XRHASH_SLOTS )
+    index = index % XRHASH_MOD; 
+
+  return index;
+}
+
 XRHash * xr_init_hash( hashfn hash , cmpfn cmp )
 {
   XRHash * table = NULL;
@@ -37,25 +69,16 @@ XRHash * xr_init_hash( hashfn hash , cmpfn cmp )
   return table;
 }
 
-
-
 int xr_hash_add( XRHash * xr, void * data )
 {
-  int hashcode      = 0;
-  int index         = 0;
   XRHashLink * slot = NULL;
-  XRHashLink * prev = NULL;
-  if ( data == NULL )
-    return XRHASH_ADD_FAILED;
+  XRHashLink * prev = NULL; 
 
-  if ( xr == NULL )
-    return XRHASH_HASH_INVALID;
+  int hashcode      = xr__get_hashcode( xr, data ); 
+  int index         = xr__get_index(xr, hashcode);
 
-  hashcode = (*xr->hash)( data ); 
-  index = hashcode;
-  while ( index >= XRHASH_SLOTS )
-    index = index % XRHASH_MOD; 
-
+  if ( index <= 0 ) return index; /* one of above failed */
+ 
   /* new node, first hit */
   if ( xr->buckets[index] == NULL ){
     xr->buckets[index] = (XRHashLink*)malloc(1 * sizeof(XRHashLink));
@@ -75,7 +98,7 @@ int xr_hash_add( XRHash * xr, void * data )
 
    /* collision, add a link */
   while ( slot != NULL ){
-    if ( (data == slot->data) || ( (*xr->cmp)(data,slot->data) == 0 ) ){
+    if ( (*xr->cmp)(data,slot->data) == 0 ){
       /* same object, do nothing */
       return XRHASH_ADDED_ALREADY;
     } else {
@@ -105,4 +128,75 @@ int xr_hash_add( XRHash * xr, void * data )
   xr->count++;
   return XRHASH_ADDED;
 }
+
+int      xr_hash_contains( XRHash * xr, void * data )
+{
+  XRHashLink * slot = NULL;
+
+  int hashcode = xr__get_hashcode( xr, data );
+  int index = 0;
+  if ( hashcode <= 0 ) return hashcode; /* error */
+  index = xr__get_index( xr, hashcode );
+  if ( index < 0 ) return index; /* error */
+
+  slot = xr->buckets[index];
+
+  if ( slot == NULL )
+    return XRHASH_EXISTS_FALSE;
+
+  while ( slot != NULL )
+  { 
+    int comp_res = (*xr->cmp)(data, slot->data);
+    if ( comp_res == 0 ){
+      return XRHASH_EXISTS_TRUE;
+    }
+    slot = slot->next;
+  }
+  return XRHASH_EXISTS_FALSE;
+}
+
+int      xr_hash_remove( XRHash * xr, void * data )
+{
+  XRHashLink * slot = NULL;
+  XRHashLink * prev = NULL;
+  int hashcode =  xr__get_hashcode(xr,data);
+  int index    =  xr__get_index(xr, hashcode);
+
+  if ( index <= 0 ) return index; /* one of above failed */
+  if ( xr->buckets[index] == NULL )
+    return XRHASH_REMOVED; /* not in hash */
+
+  slot = xr->buckets[index];
+
+  /* iterate slots until we find our match */ 
+  while ( slot != NULL ){
+    if ( (*xr->cmp)(data,slot->data) == 0 ) {
+      /* found object - remove it */
+      break;
+    } else {
+      prev = slot;
+      slot = slot->next;
+    }
+  }
+
+  if ( slot != NULL ){ /* remove this slot */
+    if ( prev == NULL ){
+      /* remove first link in this bucket */
+      xr->buckets[index] = slot->next;
+    } else {
+      /* remove this link */
+      prev->next = slot->next;
+    }
+    xr->count--;
+    slot->data = NULL;
+    slot->next = NULL;
+    free(slot);
+  } 
+
+  /* if slot == NULL, hashcode matched but the object was 
+   * not in the hash */
+
+  return XRHASH_REMOVED;
+}
+
 

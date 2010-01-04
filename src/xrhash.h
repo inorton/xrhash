@@ -8,13 +8,19 @@
 #define XRHASH_SLOTS 8192
 #define XRHASH_MOD   (XRHASH_SLOTS - 91)
 
+#define XRHASH_HASH_INVALID   -2 /* hashtable not initialized */
+#define XRHASH_NULL_DATA      -3 /* tried to insert null */
+#define XRHASH_HASHCODE_ERROR -4 /* hashfn returned <= 0 */
+
 #define XRHASH_EXISTS_TRUE    0
 #define XRHASH_EXISTS_FALSE   1
 
-#define XRHASH_ADDED_ALREADY 1
-#define XRHASH_ADDED         0
-#define XRHASH_ADD_FAILED   -1
-#define XRHASH_HASH_INVALID -2
+#define XRHASH_ADDED_ALREADY  1
+#define XRHASH_ADDED          0
+#define XRHASH_ADD_FAILED    -1
+
+#define XRHASH_REMOVED        0
+#define XRHASH_REMOVE_FAILED -1
 
 /* should never return 0, should return -ve on error */
 typedef int (*hashfn)(void*); 
@@ -47,5 +53,8 @@ int      xr_hash_add( XRHash * xr, void * data );
 /* returns XRHASH_EXISTS_TRUE or XRHASH_EXISTS_FALSE */
 int      xr_hash_contains( XRHash * xr, void * data );
 
+
+/* returns XRHASH_REMOVED or XRHASH_REMOVE_FAILED */
+int      xr_hash_remove( XRHash * xr, void * data );
 
 #endif
