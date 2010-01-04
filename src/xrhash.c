@@ -79,6 +79,9 @@ int xr_hash_add( XRHash * xr, void * data )
       /* same object, do nothing */
       return XRHASH_ADDED_ALREADY;
     } else {
+      if ( slot->hashcode == 0 ){
+        break;
+      }
       if ( slot->data == NULL ){
         break; /* use slot */
       }
