@@ -65,6 +65,7 @@ XRHash * xr_init_hash( hashfn hash , cmpfn cmp )
     table->hash = hash;
     table->cmp  = cmp;
     table->count = 0;
+    table->hash_generation = 0;
   }
   return table;
 }
@@ -88,6 +89,7 @@ int xr_hash_add( XRHash * xr, void * key, void * value )
     slot->value = value;
     slot->next = NULL; 
     xr->count++;
+    xr->hash_generation++;
     return XRHASH_ADDED;
   } else {
     slot = xr->buckets[index];
@@ -128,6 +130,7 @@ int xr_hash_add( XRHash * xr, void * key, void * value )
   slot->value = value;
   slot->next = NULL; 
   xr->count++;
+  xr->hash_generation++;
   return XRHASH_ADDED;
 }
 
@@ -190,6 +193,7 @@ int      xr_hash_remove( XRHash * xr, void * key )
       prev->next = slot->next;
     }
     xr->count--;
+    xr->hash_generation++;
     slot->key = NULL;
     slot->value = NULL;
     slot->next = NULL;
@@ -227,5 +231,44 @@ int      xr_hash_get( XRHash * xr, void * key, void **dataout )
     slot = slot->next;
   }
   return XRHASH_EXISTS_FALSE;
+}
+
+
+XRHashIter * xr_init_hashiterator( XRHash * xr )
+{
+  XRHashIter * iter = (XRHashIter*)malloc(1*sizeof(XRHashIter));
+  if ( iter == NULL ){
+    errno = ENOMEM;
+  } else {
+    iter->xr = xr;
+    iter->hash_generation = xr->hash_generation;
+    iter->current_bucket = 0;
+    iter->next_slot = xr->buckets[0];
+  }
+  return iter;
+}
+
+void * xr_hash_iteratekey( XRHashIter * iter )
+{
+  void * key = NULL;
+  if ( iter->xr->hash_generation != iter->hash_generation ){
+    fprintf(stderr,"hash changed during iteration\n");
+    abort();
+/*    return NULL; */
+  }
+  if ( iter->next_slot != NULL ){ /* iterate through links in the current bucket */
+    key = iter->next_slot->key;
+    iter->next_slot = iter->next_slot->next;
+  } else { /* no more links here, move to next bucket */
+    while ( iter->xr->buckets[++iter->current_bucket] == NULL ){
+      if ( iter->current_bucket >= XRHASH_SLOTS )
+        return NULL; /* no more filled buckets, end of iterations */
+    }
+    /* now pointing at the next slot */
+    iter->next_slot = iter->xr->buckets[iter->current_bucket];
+    key = iter->next_slot->key;
+    iter->next_slot = iter->next_slot->next;
+  }
+  return key;
 }
 

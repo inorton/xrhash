@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <errno.h>
 
 
@@ -25,6 +26,7 @@
 #define XRHASH_REMOVED        0
 #define XRHASH_REMOVE_FAILED -1
 
+
 /* should never return 0, should return -ve on error */
 typedef int (*hashfn)(void*); 
 typedef int (*cmpfn)(void*,void*);
@@ -40,12 +42,22 @@ struct link
 
 typedef struct xrhash
 {
+  int hash_generation; /* used to monitor changes in the hash  for iterators */
   hashfn hash;
   cmpfn cmp;
   size_t count; 
-
+  
   XRHashLink * buckets[XRHASH_SLOTS];
 } XRHash;
+
+typedef struct xrhash_iter
+{
+  XRHash * xr;
+  int hash_generation;
+  int current_bucket;
+  XRHashLink * next_slot;
+} XRHashIter;
+
 
 
 /* create a new empty hash, return NULL on error */
@@ -62,5 +74,9 @@ int      xr_hash_get( XRHash * xr, void * key, void **dataout );
 
 /* returns XRHASH_REMOVED or XRHASH_REMOVE_FAILED */
 int      xr_hash_remove( XRHash * xr, void * key );
+
+XRHashIter * xr_init_hashiterator( XRHash * xr );
+void * xr_hash_iteratekey( XRHashIter * iter );
+
 
 #endif
