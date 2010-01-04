@@ -12,14 +12,19 @@ typedef char uint8 ;
 typedef struct spaceship {
   char * name;
   uint8  type;
-  int x;
+  int x; /* corrdinate x100 */
   int y;
-  double heading;
+
+  int vx;
+  int vy;
+
 } spaceship;
 
 
 typedef struct spacemap {
   XRHash * xr;
+  int w;
+  int h;
 } spacemap;
 
 #define VIPER    1
@@ -31,7 +36,7 @@ int spaceship_id_hash( void * id );
 
 spacemap * spacemap_init();
 
-spaceship * new_spaceship( char* name, uint8 type, int x, int y, double head );
+spaceship * new_spaceship( char* name, uint8 type, int x, int y );
 void        spacemap_add( spacemap * map, spaceship * ship );
 spaceship * spacemap_get( spacemap * map, const char* name );
 
