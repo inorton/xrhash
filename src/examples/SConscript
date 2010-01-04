@@ -1,0 +1,5 @@
+Import("env");
+
+env.Append(CPPPATH="..")
+
+env.Program("spacemap.c",LIBS="xrhash",LIBPATH="..")
