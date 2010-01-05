@@ -47,6 +47,24 @@ spaceship * new_spaceship( char* name, uint8 type, int x, int y )
   return ship;
 }
 
+void new_random_ship(spacemap * map)
+{
+  int rand_x = ((int) rand()) % map->w;
+  int rand_y = ((int) rand()) % map->h;
+  char * shipname = (char*) malloc( 10 * sizeof(char));
+  spaceship * newship;
+  snprintf(shipname,10,"contact %d",map->xr->count + 1 );
+  newship = new_spaceship( shipname, RAIDER, rand_x, rand_y );
+
+  if ( (rand_x % 2 )) {rand_x = rand_x * -3; } else {rand_x = rand_x * 3; }
+  if ( (rand_y % 2 )) {rand_y = rand_y * -3; } else {rand_y = rand_y * 3; }
+
+  newship->vx = rand_x;
+  newship->vy = rand_y;
+
+  spacemap_add( map, newship );
+}
+
 void spacemap_add( spacemap * map, spaceship * ship )
 {
   xr_hash_add( map->xr, (void*)ship->name, ship );
@@ -169,14 +187,9 @@ int main( int argc, char** argv )
   int info_width = 30;
   int info_height;
 
-  int rand_x;
-  int rand_y;
-
   spacemap * map = spacemap_init();
   spaceship * bob;
-  spaceship * newship;
 
-  char * shipname;
 
   /* setup ncurses */
   
@@ -212,23 +225,16 @@ int main( int argc, char** argv )
     {
       case KEY_F(2):
       /* make a new ship */
-      rand_x = ((int) rand()) % map_width;
-      rand_y = ((int) rand()) % map_height;
-      shipname = (char*) malloc( 10 * sizeof(char));
-      snprintf(shipname,10,"contact %d",map->xr->count + 1 );
-      newship = new_spaceship( shipname, RAIDER, rand_x, rand_y );
+      new_random_ship( map );
+      break;
 
-      if ( (rand_x % 2 )) {rand_x = rand_x * -3; } else {rand_x = rand_x * 3; }
-      if ( (rand_y % 2 )) {rand_y = rand_y * -3; } else {rand_y = rand_y * 3; }
-      
-      newship->vx = rand_x;
-      newship->vy = rand_y;
+      case KEY_DOWN:
+      break;
 
-      spacemap_add( map, newship );
+      case KEY_UP:
       break;
 
       default:
-      
       break;
     }
     wrefresh( w_map );
