@@ -3,9 +3,13 @@ xrhash - (c) 2010 Ian Norton-Badrul <inorton-at-gmail>
 xrhash is a simple to use 'dictionary' object for C. It currently supports the
 following operations:-
 
- add
- remove
- exists
+ add( key, value )
+ remove( key )
+ value get( key )
+ exists( key )
+ 
+ iterate each assigned key in the hash.
+
 
 Examples
 ---------
@@ -24,13 +28,13 @@ XRHash * myhash = xr_init_hash( NULL, NULL );
 // add value with key 
 assert( xr_hash_add( myhash, mykey, myval ) == XRHASH_ADDED );
 
+See also spacemap.c in the examples folder
+
 
 You should implement your own hashcode genration function for key values and a pass pointer this in to the first argument of xr_init_hash().
 
 You should also define a comparison function that will compare two keys for equality ( eg, like strcmp ).
 
-
-iteration is planned soon.
 
 Building
 ---------
