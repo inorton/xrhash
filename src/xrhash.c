@@ -264,6 +264,11 @@ void * xr_hash_iteratekey( XRHashIter * iter )
       if ( iter->current_bucket >= XRHASH_SLOTS )
         return NULL; /* no more filled buckets, end of iterations */
     }
+
+    /* reached the end of the hash */
+    if ( iter->current_bucket >= XRHASH_SLOTS )
+      return NULL; /* end of iterations */
+
     /* now pointing at the next slot */
     iter->next_slot = iter->xr->buckets[iter->current_bucket];
     key = iter->next_slot->key;

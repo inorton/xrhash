@@ -41,8 +41,8 @@ spaceship * new_spaceship( char* name, uint8 type, int x, int y )
   ship->x = x * 100;
   ship->y = y * 100;
 
-  ship->vx = 100;
-  ship->vy = 50;
+  ship->vx = 0;
+  ship->vy = 0;
 
   return ship;
 }
@@ -56,8 +56,8 @@ void new_random_ship(spacemap * map)
   snprintf(shipname,10,"contact %d",map->xr->count + 1 );
   newship = new_spaceship( shipname, RAIDER, rand_x, rand_y );
 
-  if ( (rand_x % 2 )) {rand_x = rand_x * -3; } else {rand_x = rand_x * 3; }
-  if ( (rand_y % 2 )) {rand_y = rand_y * -3; } else {rand_y = rand_y * 3; }
+  if ( (rand_x % 2 )) {rand_x = rand_x * -0.5; } else {rand_x = rand_x * 0.5; }
+  if ( (rand_y % 2 )) {rand_y = rand_y * -0.5; } else {rand_y = rand_y * 0.5; }
 
   newship->vx = rand_x;
   newship->vy = rand_y;
@@ -139,6 +139,63 @@ void clearships( spacemap * map, WINDOW * wind )
   free ( iter );
 }
 
+void paintinfo ( spacemap * map, WINDOW * wind )
+{
+
+  int menu_row      = 0;
+  int menu_max_rows = LINES - 12;
+  XRHashIter * iter = xr_init_hashiterator( map->xr );
+  void * key = NULL;
+  spaceship * current = spacemap_get( map, map->selected_ship );
+  werase( wind );
+  
+  /* paint selected item details */
+
+  mvwprintw( wind, 3, 2, "Current Target" );
+  wattron(wind,A_BOLD);
+
+  mvwprintw( wind, 5, 2, "Name: %s", current->name );
+  mvwprintw( wind, 6, 2, "Position: x = %d", current->x );
+  mvwprintw( wind, 7, 2, "          y = %d", current->y );
+   
+  wattroff(wind,A_BOLD);
+
+  /* paint list - with selected highlighted */ 
+
+
+  mvwprintw( wind, 10, 2, "%d Radar Contact(s)", map->xr->count );
+
+  while (( key = xr_hash_iteratekey( iter ) ) != NULL ){
+    char * iname = (char*)key;
+
+    if ( menu_row > menu_max_rows ) break;
+
+    if ( strcmp(iname,current->name) == 0 ){
+      wattron(wind,A_REVERSE);
+    }
+
+    mvwprintw( wind, 12 + menu_row, 2, "* %-12s", iname );
+
+
+    if ( strcmp(iname,current->name) == 0 ){
+      wattroff(wind,A_REVERSE);
+    }
+
+    menu_row++;
+
+  }
+  free(iter);
+
+  /* paint help */
+
+  mvwprintw( wind, LINES - 7, 2 , "F1   - Quit" );
+  mvwprintw( wind, LINES - 6, 2 , "F2   - Create Ship" );
+  mvwprintw( wind, LINES - 5, 2 , "F9   - Select Previous Ship" );
+  mvwprintw( wind, LINES - 4, 2 , "F10  - Select Next Ship" );
+
+  box( wind, 0,0 );
+}
+
 void paintships( spacemap * map, WINDOW * wind )
 {
   XRHashIter * iter = xr_init_hashiterator( map->xr );
@@ -159,13 +216,17 @@ void paintships( spacemap * map, WINDOW * wind )
     mvwprintw( wind, shipy, shipx, "*" );
 
     if ( strcmp( map->selected_ship, ship->name ) == 0 ){
-      wattron(wind,A_REVERSE);      
-    }
+      wattron(wind,A_BOLD);      
+    } else {
+      wattron(wind,A_DIM);
+    } 
 
     mvwprintw( wind, shipy+1,shipx+1,"%s", ship->name ); 
 
     if ( strcmp( map->selected_ship, ship->name ) == 0 ){
-      wattroff(wind,A_REVERSE);      
+      wattroff(wind,A_BOLD);      
+    } else {
+      wattron(wind,A_DIM);
     }
 
 
@@ -173,6 +234,51 @@ void paintships( spacemap * map, WINDOW * wind )
 
   free ( iter );
 }
+
+void choose_next( spacemap * map )
+{
+  XRHashIter * iter = xr_init_hashiterator( map->xr );
+  void * next = NULL;
+
+  while (( next = xr_hash_iteratekey( iter ) ) != NULL )
+  {
+    if ( next != NULL ){
+      if ( strcmp( map->selected_ship, (char*) next ) == 0 ){
+        next = xr_hash_iteratekey( iter );
+        if ( next != NULL ){
+          map->selected_ship = next;
+          break;
+        }
+      }
+    }
+  }
+  free(iter);
+}
+
+void choose_previous ( spacemap * map )
+{
+  XRHashIter * iter = xr_init_hashiterator( map->xr );
+
+  void * prev = NULL;
+  void * next = NULL;
+
+  do {
+    if ( next != NULL ){
+      if ( strcmp(next,map->selected_ship) == 0 ){
+        if ( prev != NULL )
+          map->selected_ship = prev;
+        break;
+      }
+    }
+    prev = next;
+  } while ( ( next = xr_hash_iteratekey( iter ) ) != NULL );
+
+  free(iter);
+}
+
+
+
+
 
 WINDOW * w_map;
 WINDOW * w_info;
@@ -184,12 +290,11 @@ int main( int argc, char** argv )
 
   int ch;
 
-  int info_width = 30;
+  int info_width = 38;
   int info_height;
 
   spacemap * map = spacemap_init();
   spaceship * bob;
-
 
   /* setup ncurses */
   
@@ -217,8 +322,11 @@ int main( int argc, char** argv )
 
   /* add first ship */
   bob = new_spaceship("bob",VIPER, 5, 12 );
+  bob->vx = 20;
+  bob->vy = 34;
   spacemap_add( map, bob );
 
+ 
   /* game loop */
   while((ch = getch()) != KEY_F(1))
   { switch(ch)
@@ -228,10 +336,12 @@ int main( int argc, char** argv )
       new_random_ship( map );
       break;
 
-      case KEY_DOWN:
+      case KEY_F(10):
+      choose_next( map );
       break;
 
-      case KEY_UP:
+      case KEY_F(9):
+      choose_previous( map );
       break;
 
       default:
@@ -244,10 +354,13 @@ int main( int argc, char** argv )
     moveships( map );    
     /* show ships */
     paintships( map, w_map );
+
+    paintinfo( map, w_info );
+
     box( w_map, 0, 0 );
 
     /* game loop delay */
-    timeout(500);
+    timeout(100);
   }  
 
   endwin();
