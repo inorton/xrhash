@@ -51,9 +51,9 @@ void new_random_ship(spacemap * map)
 {
   int rand_x = ((int) rand()) % map->w;
   int rand_y = ((int) rand()) % map->h;
-  char * shipname = (char*) malloc( 10 * sizeof(char));
+  char * shipname = (char*) malloc( 20 * sizeof(char));
   spaceship * newship;
-  snprintf(shipname,10,"contact %d",map->xr->count + 1 );
+  snprintf(shipname,20,"contact %d",map->xr->count + 1 );
   newship = new_spaceship( shipname, RAIDER, rand_x, rand_y );
 
   if ( (rand_x % 2 )) {rand_x = rand_x * -0.5; } else {rand_x = rand_x * 0.5; }
@@ -143,7 +143,7 @@ void paintinfo ( spacemap * map, WINDOW * wind )
 {
 
   int menu_row      = 0;
-  int menu_max_rows = LINES - 12;
+  int menu_max_rows = LINES / 2;
   XRHashIter * iter = xr_init_hashiterator( map->xr );
   void * key = NULL;
   spaceship * current = spacemap_get( map, map->selected_ship );
@@ -213,17 +213,18 @@ void paintships( spacemap * map, WINDOW * wind )
     shipy = ( ship->y / 100 ) ;
 
 
-    mvwprintw( wind, shipy, shipx, "*" );
 
     if ( strcmp( map->selected_ship, ship->name ) == 0 ){
       wattron(wind,A_BOLD);      
+      mvwprintw( wind, shipy, shipx, "*" );
     } else {
       wattron(wind,A_DIM);
+      mvwprintw( wind, shipy, shipx, "." );
     } 
 
-    mvwprintw( wind, shipy+1,shipx+1,"%s", ship->name ); 
 
     if ( strcmp( map->selected_ship, ship->name ) == 0 ){
+      mvwprintw( wind, shipy+1,shipx+1,"%s", ship->name ); 
       wattroff(wind,A_BOLD);      
     } else {
       wattron(wind,A_DIM);
@@ -333,6 +334,7 @@ int main( int argc, char** argv )
     {
       case KEY_F(2):
       /* make a new ship */
+      srand( bob->y );
       new_random_ship( map );
       break;
 
