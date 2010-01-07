@@ -1,6 +1,6 @@
 import os
 
-env = Environment()
+Import("env")
 env.Append(CFLAGS="-Wall -Werror")
 env.Append(CFLAGS="-g -O0")
 libxrhash = env.Library( "xrhash","xrhash.c")
