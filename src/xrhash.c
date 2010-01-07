@@ -43,13 +43,19 @@ inline int xr__get_index( XRHash * xr, int hashcode )
     return XRHASH_HASH_INVALID;
 
   index = hashcode;
-  while ( index >= XRHASH_SLOTS )
+  while ( index >= xr->maxslots )
     index = index % XRHASH_MOD; 
 
   return index;
 }
 
 XRHash * xr_init_hash( hashfn hash , cmpfn cmp )
+{
+  return xr_init_hash_len( hash, cmp, XRHASH_SLOTS );
+}
+
+
+XRHash * xr_init_hash_len( hashfn hash , cmpfn cmp, size_t len )
 {
   XRHash * table = NULL;
 
@@ -65,7 +71,9 @@ XRHash * xr_init_hash( hashfn hash , cmpfn cmp )
     table->hash = hash;
     table->cmp  = cmp;
     table->count = 0;
+    table->maxslots = len;
     table->hash_generation = 0;
+    table->buckets = (XRHashLink**)calloc(len,sizeof(XRHashLink*));
   }
   return table;
 }
@@ -261,12 +269,12 @@ void * xr_hash_iteratekey( XRHashIter * iter )
     iter->next_slot = iter->next_slot->next;
   } else { /* no more links here, move to next bucket */
     while ( iter->xr->buckets[++iter->current_bucket] == NULL ){
-      if ( iter->current_bucket >= XRHASH_SLOTS )
+      if ( iter->current_bucket >= iter->xr->maxslots )
         return NULL; /* no more filled buckets, end of iterations */
     }
 
     /* reached the end of the hash */
-    if ( iter->current_bucket >= XRHASH_SLOTS )
+    if ( iter->current_bucket >= iter->xr->maxslots )
       return NULL; /* end of iterations */
 
     /* now pointing at the next slot */
@@ -275,5 +283,29 @@ void * xr_hash_iteratekey( XRHashIter * iter )
     iter->next_slot = iter->next_slot->next;
   }
   return key;
+}
+
+
+int   xr_hash__strhash( void * instr )
+{
+  /* this hashes strings in a similar way to the mono String.cs class */
+  char* str = (char*) instr;
+  size_t len = strlen(str);
+  int hash = 0;
+  int c = 0;
+  while ( c < len ){
+    hash = (hash << 5) - hash + str[c];
+    c++;
+  }
+  if ( hash < 1 )
+    hash = 3 + ( hash * -1 );
+
+  return hash;
+
+}
+
+int   xr_hash__strcmp( void * stra, void * strb )
+{
+  return strcmp((char*)stra,(char*)strb);
 }
 

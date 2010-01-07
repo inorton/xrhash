@@ -5,25 +5,13 @@
 
 int spaceship_id_cmp( void * id_a, void * id_b )
 {
-  return strcmp((char*)id_a,(char*)id_b);
+  return xr_hash__strcmp( id_a, id_b );
 }
 
 /* id is a pointer to spaceship.id */
 int spaceship_id_hash( void * id )
 {
-  /* this hashes strings in a similar way to the mono String.cs class */
-  char* str = (char*) id;
-  size_t len = strlen(str);
-  int hash = 0;
-  int c = 0;
-  while ( c < len ){
-    hash = (hash << 5) - hash + str[c];
-    c++;
-  }
-  if ( hash < 1 )
-    hash = 3 + ( hash * -1 );
-
-  return hash;
+  return xr_hash__strhash( id );
 }
 
 spacemap * spacemap_init()

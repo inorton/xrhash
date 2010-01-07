@@ -56,9 +56,9 @@ typedef struct xrhash
   int hash_generation; /* used to monitor changes in the hash  for iterators */
   hashfn hash;
   cmpfn cmp;
-  size_t count; 
-  
-  XRHashLink * buckets[XRHASH_SLOTS];
+  size_t count;
+  size_t maxslots; 
+  XRHashLink ** buckets;
 } XRHash;
 
 
@@ -85,6 +85,17 @@ typedef struct xrhash_iter
 */
 XRHash * xr_init_hash( int (*hash)(void*) , int(*cmp)(void*,void*) );
 
+
+/** 
+* @brief initialize a xrhash hashtable object with a specific number of hash buckets
+* 
+* @param hash callback function for hashcode generation
+* @param cmp callback function for equality comparison (eg strcmp)
+* @param len number of buckets to use
+* 
+* @return 
+*/
+XRHash * xr_init_hash_len( int (*hash)(void*), int(*cmp)(void*,void*), size_t len );
 
 /** 
 * @brief add an object to the given xr hashtable
@@ -151,6 +162,26 @@ XRHashIter * xr_init_hashiterator( XRHash * xr );
 void * xr_hash_iteratekey( XRHashIter * iter );
 
 
+
+/** 
+* @brief generate a hashcode for a given null terminated string
+* 
+* @param str string to hash
+* 
+* @return hashcode > 1 on success, <= 0 on error
+*/
+int   xr_hash__strhash( void * str );
+
+
+/** 
+* @brief wrapper around strcmp
+* 
+* @param stra
+* @param strb
+* 
+* @return 0,-1 or 1
+*/
+int   xr_hash__strcmp( void * stra, void * strb );
 
 
 #endif
