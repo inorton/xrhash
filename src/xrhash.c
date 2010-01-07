@@ -32,10 +32,15 @@ inline int xr__get_hashcode( XRHash * xr, void * key )
     return XRHASH_HASHCODE_ERROR;
   return ret;
 }
+int xr_get_hashcode( XRHash * xr, void * key )
+{
+  return xr__get_hashcode( xr, key );
+}
 
 inline int xr__get_index( XRHash * xr, int hashcode )
 {
   int index      = 0;
+  int pindex     = 0;
   if ( hashcode <= 0 )
     return hashcode;
 
@@ -43,11 +48,23 @@ inline int xr__get_index( XRHash * xr, int hashcode )
     return XRHASH_HASH_INVALID;
 
   index = hashcode;
-  while ( index >= xr->maxslots )
-    index = index % XRHASH_MOD; 
-
+  while ( index >= xr->maxslots ){
+    pindex = index;
+    index = index % ( xr->maxslots - xr->index_mod_magic );
+    if ( index < 1 ){
+      index = (index * -1);  
+    }
+    if ( index == 0 ){
+      index = 1 + ( pindex - ( pindex / 3 ));
+    }
+  }
   return index;
 }
+int xr_get_index( XRHash * xr, int hashcode )
+{
+  return xr__get_index( xr, hashcode );
+}
+
 
 XRHash * xr_init_hash( hashfn hash , cmpfn cmp )
 {
@@ -73,9 +90,33 @@ XRHash * xr_init_hash_len( hashfn hash , cmpfn cmp, size_t len )
     table->count = 0;
     table->maxslots = len;
     table->hash_generation = 0;
+    table->index_mod_magic = ( len > 512 ) ? 91 : 3 ;
     table->buckets = (XRHashLink**)calloc(len,sizeof(XRHashLink*));
   }
   return table;
+}
+
+void xr_hash_free( XRHash * xr )
+{
+  if ( xr == NULL ) return;
+  XRHashLink * slot = xr->buckets[0];
+  int bucket = 0;
+  while ( slot != NULL ){
+    XRHashLink * nextslot = slot->next;
+    if ( nextslot == NULL ){
+      if ( (++bucket) < ( xr->maxslots ) ){
+        nextslot = xr->buckets[bucket];
+      }
+    } else {
+      if ( slot != xr->buckets[bucket] ){
+        slot->next = NULL;
+        free( slot );
+      }
+    }
+    slot = nextslot;
+  }
+  free(xr->buckets);
+  free(xr);
 }
 
 int xr_hash_add( XRHash * xr, void * key, void * value )
@@ -91,6 +132,7 @@ int xr_hash_add( XRHash * xr, void * key, void * value )
   /* new node, first hit */
   if ( xr->buckets[index] == NULL ){
     xr->buckets[index] = (XRHashLink*)malloc(1 * sizeof(XRHashLink));
+    xr->touched_indexes++;
     slot = xr->buckets[index];
     slot->hashcode = hashcode;
     slot->key  = key;
@@ -268,10 +310,10 @@ void * xr_hash_iteratekey( XRHashIter * iter )
     key = iter->next_slot->key;
     iter->next_slot = iter->next_slot->next;
   } else { /* no more links here, move to next bucket */
-    while ( iter->xr->buckets[++iter->current_bucket] == NULL ){
-      if ( iter->current_bucket >= iter->xr->maxslots )
-        return NULL; /* no more filled buckets, end of iterations */
-    }
+    do { 
+      if ( ++iter->current_bucket >= iter->xr->maxslots )
+          return NULL; /* no more filled buckets, end of iterations */
+    } while ( iter->xr->buckets[iter->current_bucket] == NULL );
 
     /* reached the end of the hash */
     if ( iter->current_bucket >= iter->xr->maxslots )
@@ -297,8 +339,8 @@ int   xr_hash__strhash( void * instr )
     hash = (hash << 5) - hash + str[c];
     c++;
   }
-  if ( hash < 1 )
-    hash = 3 + ( hash * -1 );
+  while ( hash < 1 )
+    hash = 1 + ( hash * -1 );
 
   return hash;
 

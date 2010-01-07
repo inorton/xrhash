@@ -10,7 +10,6 @@
 #ifndef XRHASH_SLOTS
 #define XRHASH_SLOTS 8192
 #endif
-#define XRHASH_MOD   (XRHASH_SLOTS - 91)
 
 #define XRHASH_HASH_INVALID   -2 /* hashtable not initialized */
 #define XRHASH_NULL_KEY      -3 /* tried to insert a null key */
@@ -57,7 +56,9 @@ typedef struct xrhash
   hashfn hash;
   cmpfn cmp;
   size_t count;
+  size_t touched_indexes;
   size_t maxslots; 
+  int    index_mod_magic;
   XRHashLink ** buckets;
 } XRHash;
 
@@ -96,6 +97,15 @@ XRHash * xr_init_hash( int (*hash)(void*) , int(*cmp)(void*,void*) );
 * @return 
 */
 XRHash * xr_init_hash_len( int (*hash)(void*), int(*cmp)(void*,void*), size_t len );
+
+
+/** 
+* @brief free and xrhash
+* 
+* @param xr hashtable to free
+*/
+void xr_hash_free( XRHash * xr );
+
 
 /** 
 * @brief add an object to the given xr hashtable
@@ -182,6 +192,11 @@ int   xr_hash__strhash( void * str );
 * @return 0,-1 or 1
 */
 int   xr_hash__strcmp( void * stra, void * strb );
+
+
+int   xr_get_index( XRHash * xr, int hashcode );
+int   xr_get_hashcode( XRHash * xr, void*keyptr );
+
 
 
 #endif
