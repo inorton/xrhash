@@ -1,0 +1,12 @@
+import os
+
+env = Environment()
+env.Append(CFLAGS="-Wall -Werror")
+env.Append(CFLAGS="-g -O0")
+libxrhash = env.Library( "xrhash","xrhash.c")
+
+env.Append(CPPPATH=os.getcwd() )
+
+Export("env");
+
+SConscript("tests/SConscript",exports="env")

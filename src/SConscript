@@ -1,9 +1,0 @@
-env = Environment()
-env.Append(CFLAGS="-Wall -Werror")
-env.Append(CFLAGS="-g -O0")
-env.Library( "xrhash","xrhash.c");
-
-Export("env");
-
-SConscript("tests/SConscript");
-SConscript("examples/SConscript")

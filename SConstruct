@@ -1,1 +1,1 @@
-SConscript("src/SConscript");
+SConscript("src/lib/SConscript");
