@@ -1,5 +1,3 @@
 Import("env");
 
-env.Append(CPPPATH="..")
-
-env.Program("spacemap.c",LIBS=["xrhash","ncurses"],LIBPATH="..")
+env.Program("spacemap.c",LIBS=["xrhash","ncurses"])

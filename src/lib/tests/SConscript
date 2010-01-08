@@ -1,4 +1,4 @@
 Import("env")
-env.Program( "xrhash-test", ["xrhash-test.c","testutils.c"] ,LIBS="xrhash",LIBPATH=".." );
+env.Program( "xrhash-test", ["xrhash-test.c","testutils.c"] ,LIBS="xrhash" );
 
 
