@@ -42,7 +42,6 @@ struct link
 {
   void       * key;
   void       * value;
-  int          hashcode;
   XRHashLink * next;
 };
 

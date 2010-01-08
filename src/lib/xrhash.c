@@ -134,7 +134,6 @@ int xr_hash_add( XRHash * xr, void * key, void * value )
     xr->buckets[index] = (XRHashLink*)malloc(1 * sizeof(XRHashLink));
     xr->touched_indexes++;
     slot = xr->buckets[index];
-    slot->hashcode = hashcode;
     slot->key  = key;
     slot->value = value;
     slot->next = NULL; 
@@ -155,9 +154,6 @@ int xr_hash_add( XRHash * xr, void * key, void * value )
       /* same object, do nothing */
       return XRHASH_ADDED_ALREADY;
     } else {
-      if ( slot->hashcode == 0 ){
-        break;
-      }
       if ( slot->key == NULL ){
         break; /* use slot */
       }
@@ -175,7 +171,6 @@ int xr_hash_add( XRHash * xr, void * key, void * value )
       return XRHASH_ADD_FAILED;
     } 
   }
-  slot->hashcode = hashcode;
   slot->key = key;
   slot->value = value;
   slot->next = NULL; 
