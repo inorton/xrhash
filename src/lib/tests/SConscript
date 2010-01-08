@@ -1,6 +1,4 @@
 Import("env")
-env.Append(CFLAGS="-Wall -Werror")
-env.Append(CFLAGS="-g -O0")
 env.Program( "xrhash-test", ["xrhash-test.c","testutils.c"] ,LIBS="xrhash",LIBPATH=".." );
 
 
