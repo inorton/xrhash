@@ -161,6 +161,12 @@ int      xr_hash_remove( XRHash * xr, void * key );
 */
 XRHashIter * xr_init_hashiterator( XRHash * xr );
 
+/** 
+* @brief reset a hash iterator 
+* 
+* @param iter
+*/
+void xr_hash_resetiterator( XRHashIter * iter );
 
 /** 
 * @brief iterate to the next item using a hash iterator

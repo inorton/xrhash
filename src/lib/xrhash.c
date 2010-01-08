@@ -291,11 +291,17 @@ XRHashIter * xr_init_hashiterator( XRHash * xr )
     errno = ENOMEM;
   } else {
     iter->xr = xr;
-    iter->hash_generation = xr->hash_generation;
-    iter->current_bucket = 0;
-    iter->next_slot = xr->buckets[0];
+    xr_hash_resetiterator( iter );
   }
   return iter;
+}
+
+void xr_hash_resetiterator( XRHashIter * iter )
+{
+  iter->hash_generation = iter->xr->hash_generation;
+  iter->current_bucket = 0;
+  iter->next_slot = iter->xr->buckets[0];
+
 }
 
 void * xr_hash_iteratekey( XRHashIter * iter )
