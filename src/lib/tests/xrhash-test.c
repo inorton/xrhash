@@ -128,8 +128,8 @@ int runtest( int hashsize )
 
   fprintf(stderr,"\n---\ncompleted test:");
   fprintf(stderr,"unique items added    : %d\n",datacount);
-  fprintf(stderr,"used unique indexes   : %d\n",xr->touched_indexes);
-  fprintf(stderr,"index collisions      : %d\n",datacount - xr->touched_indexes);
+  fprintf(stderr,"used unique indexes   : %ld\n",(long)xr->touched_indexes);
+  fprintf(stderr,"index collisions      : %lu\n",(unsigned long)( datacount - xr->touched_indexes));
   fprintf(stderr,"collision factor      : %f\n", ( xr->touched_indexes + 0.0 ) / datacount );
   fprintf(stderr,"average lookups / key : %f\n", ( datacount + 0.0 ) / xr->touched_indexes );
 

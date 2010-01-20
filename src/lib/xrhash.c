@@ -17,7 +17,7 @@ int xr__cmp_pointers( void * a, void * b )
   return 0;
 }
 
-inline int xr__get_hashcode( XRHash * xr, void * key )
+int xr__get_hashcode( XRHash * xr, void * key )
 {
   int ret = 0;
   if ( key == NULL )
@@ -37,7 +37,7 @@ int xr_get_hashcode( XRHash * xr, void * key )
   return xr__get_hashcode( xr, key );
 }
 
-inline int xr__get_index( XRHash * xr, int hashcode )
+int xr__get_index( XRHash * xr, int hashcode )
 {
   int index      = 0;
   int pindex     = 0;
