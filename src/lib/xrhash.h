@@ -51,14 +51,14 @@ struct link
 */
 typedef struct xrhash
 {
-  int hash_generation; /* used to monitor changes in the hash  for iterators */
-  hashfn hash;
-  cmpfn cmp;
-  size_t count;
-  size_t touched_indexes;
-  size_t maxslots; 
-  int    index_mod_magic;
-  XRHashLink ** buckets;
+  int hash_generation; /** used to monitor changes in the hash  for iterators */
+  hashfn hash; /** function to generate hashcodes */
+  cmpfn cmp; /** function to compare keys ( eg strcmp() ) */
+  size_t count; /** number of unique items assigned */
+  size_t touched_indexes; /* number of unique hashcodes used */
+  size_t maxslots; /** total number of availible hashcodes */
+  int    index_mod_magic; 
+  XRHashLink ** buckets; 
 } XRHash;
 
 
@@ -67,10 +67,10 @@ typedef struct xrhash
 */
 typedef struct xrhash_iter
 {
-  XRHash * xr;
-  int hash_generation;
-  int current_bucket;
-  XRHashLink * next_slot;
+  XRHash * xr; /** hash this iterator operates on */
+  int hash_generation; /** used to check for changes in the hash */
+  int current_bucket; 
+  XRHashLink * next_slot; 
 } XRHashIter;
 
 
