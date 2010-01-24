@@ -142,6 +142,7 @@ int runtest( int hashsize )
   xrhash_fast_iterator * fast = xr_init_fasthashiterator( xr ); 
   void ** _key;
   while ( ( _key = xr_hash_fastiteratekey( fast ) ) != NULL ){
+
   }
   x = 0;
 
