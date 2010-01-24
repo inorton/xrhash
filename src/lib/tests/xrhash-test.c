@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include "xrhash.h"
+#include "xrhash_fast.h"
 #include <assert.h>
 
 #include "testutils.h"
@@ -123,9 +124,6 @@ int runtest( int hashsize )
 
   assert( xr->count == 0 );
 
-
-
-
   fprintf(stderr,"\n---\ncompleted test:");
   fprintf(stderr,"unique items added    : %d\n",datacount);
   fprintf(stderr,"used unique indexes   : %ld\n",(long)xr->touched_indexes);
@@ -134,6 +132,30 @@ int runtest( int hashsize )
   fprintf(stderr,"average lookups / key : %f\n", ( datacount + 0.0 ) / xr->touched_indexes );
 
 
+  fprintf(stderr,"\n------------\ntest fast iter\n");
+  newstr = data_vec;
+  x = 0;
+  while ( x < datacount ){
+    xr_hash_add( xr, newstr, (void*) x++ );
+    newstr += datalen;
+  }
+  xrhash_fast_iterator * fast = xr_init_fasthashiterator( xr ); 
+  void ** _key;
+  while ( ( _key = xr_hash_fastiteratekey( fast ) ) != NULL ){
+  }
+  x = 0;
+
+  gettimeofday ( &tstart, 0 );
+  while ( x++ < 10 ){
+    xr_hash_resetfastiterator( fast );
+    while ( ( _key = xr_hash_fastiteratekey( fast ) ) != NULL ){
+    }
+  }
+  gettimeofday ( &tend, 0 );
+  fprintf(stderr,"* avg %lld us per iter step\n",
+    timeval_diff(NULL,&tend,&tstart) / ( 10 * datacount ) );
+
+  xr_hash_fastiterator_free( fast );
   xr_hash_free( xr );
   free(data_vec);
 

@@ -99,21 +99,23 @@ XRHash * xr_init_hash_len( hashfn hash , cmpfn cmp, size_t len )
 void xr_hash_free( XRHash * xr )
 {
   if ( xr == NULL ) return;
-  XRHashLink * slot = xr->buckets[0];
+  XRHashLink * slot;
   int bucket = 0;
-  while ( slot != NULL ){
-    XRHashLink * nextslot = slot->next;
-    if ( nextslot == NULL ){
-      if ( (++bucket) < ( xr->maxslots ) ){
-        nextslot = xr->buckets[bucket];
-      }
-    } else {
-      if ( slot != xr->buckets[bucket] ){
-        slot->next = NULL;
-        free( slot );
+  while ( bucket < xr->maxslots ){
+    if ( xr->buckets[bucket] != NULL ){
+      slot = xr->buckets[bucket];
+      /* iterate through and free links */
+      if ( slot != NULL ){
+        XRHashLink * prevslot = NULL;
+        XRHashLink * nextslot = slot;
+        while ( nextslot != NULL ){
+          prevslot = nextslot;
+          nextslot = prevslot->next;
+          free(prevslot);
+        }
       }
     }
-    slot = nextslot;
+    bucket++;
   }
   free(xr->buckets);
   free(xr);

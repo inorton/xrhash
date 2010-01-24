@@ -1,7 +1,7 @@
 import os
 
 Import("env")
-libxrhash = env.Library( "xrhash","xrhash.c")
+libxrhash = env.Library( "xrhash",["xrhash.c","xrhash_fast.c"])
 env.Append(LIBPATH=os.getcwd() )
 env.Append(CPPPATH=os.getcwd() )
 
