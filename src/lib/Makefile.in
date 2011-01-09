@@ -23,6 +23,7 @@ clean:
 
 test: $(STATIC_TARGET) 
 	$(MAKE) -e -C tests SRCROOT='${SRCROOT}' 
+	$(MAKE) -e -C tests test
 
 
 $(STATIC_TARGET): $(OBJS)

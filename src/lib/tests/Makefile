@@ -7,7 +7,10 @@ LIBS=$(XRHASHLIB)
 all: $(TARGET)
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) $(TARGET)
+
+test: $(TARGET)
+	./$(TARGET)
 
 $(TARGET): $(OBJS) $(XRHASHLIB)
 	$(CC) -o $@ $^
