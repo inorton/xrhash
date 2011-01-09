@@ -1,0 +1,18 @@
+ifeq ($(SRCROOT),)
+		SRCROOT=${CURDIR}
+endif
+
+include ${SRCROOT}/platform.make
+
+export SRCROOT
+
+all: test
+	$(MAKE) -C src/lib
+
+clean:
+	$(MAKE) -C src/lib clean
+
+test:
+	$(MAKE) -C src/lib test
+
+
