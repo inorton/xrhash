@@ -30,6 +30,7 @@ test: $(STATIC_TARGET)
 
 install: $(STATIC_TARGET) $(HEADERS)
 	cp -f $(STATIC_TARGET) $(LIBDIR)
+	mkdir -p ${INCLUDEDIR}/xrhash
 	cp -f $(HEADERS) ${INCLUDEDIR}/xrhash/.
 
 $(OBJS): $(HEADERS)
