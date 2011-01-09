@@ -3,6 +3,11 @@ LIBPREFIX=lib
 STATIC_SUFFIX=a
 DYNAMIC_SUFFIX=so
 
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
 export CFLAGS
 export LIBPREFIX
 export STATIC_SUFFIX

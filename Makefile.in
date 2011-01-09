@@ -4,15 +4,22 @@ endif
 
 include ${SRCROOT}/platform.make
 
+PKGCONFIGDIR=${libdir}/pkgconfig
+
 export SRCROOT
 
-all: test
+all: xrhash
+
+xrhash: 
 	$(MAKE) -C src/lib
 
 clean:
 	$(MAKE) -C src/lib clean
 
-test:
+test: xrhash
 	$(MAKE) -C src/lib test
 
-
+install: all
+	$(MAKE) -C src/lib install
+	cp -f xrhash.pc ${PKGCONFIGDIR}/. 
+	cp -f src/lib/libxrhash.a ${LIBDIR}/.

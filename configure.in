@@ -2,6 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
+
+FULL-PACKAGE-NAME=libxrhash
+VERSION=0.1
+BUG-REPORT-ADDRESS
+
 AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
 AC_CONFIG_SRCDIR([src/lib/xrhash.c])
 
@@ -24,6 +29,8 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([gettimeofday memset strdup])
 
 AC_CONFIG_FILES([Makefile
+                 platform.make
+                 xrhash.pc
                  src/lib/Makefile
                  src/lib/tests/Makefile])
 AC_OUTPUT

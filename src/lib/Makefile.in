@@ -5,7 +5,10 @@ endif
 include ${SRCROOT}/platform.make
 
 OBJS=xrhash.o xrhash_fast.o
+HEADERS=xrhash.h xrhash_fast.h
 LIBNAME=xrhash
+LIBDIR=${libdir}
+INCLUDEDIR=${includedir}
 
 STATIC_TARGET=$(LIBPREFIX)$(LIBNAME).$(STATIC_SUFFIX)
 XRHASHLIB=${CURDIR}/$(STATIC_TARGET)
@@ -25,6 +28,11 @@ test: $(STATIC_TARGET)
 	$(MAKE) -e -C tests SRCROOT='${SRCROOT}' 
 	$(MAKE) -e -C tests test
 
+install: $(STATIC_TARGET) $(HEADERS)
+	cp -f $(STATIC_TARGET) $(LIBDIR)
+	cp -f $(HEADERS) ${INCLUDEDIR}/xrhash/.
+
+$(OBJS): $(HEADERS)
 
 $(STATIC_TARGET): $(OBJS)
 	ar ru $@ $^
