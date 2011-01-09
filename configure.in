@@ -3,11 +3,7 @@
 
 AC_PREREQ([2.67])
 
-FULL-PACKAGE-NAME=libxrhash
-VERSION=0.1
-BUG-REPORT-ADDRESS
-
-AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AC_INIT([libxrhash], [0.1], [inorton@gmail.com])
 AC_CONFIG_SRCDIR([src/lib/xrhash.c])
 
 # Checks for programs.

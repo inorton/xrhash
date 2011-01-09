@@ -3,10 +3,10 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libxrhash
+Name: @PACKAGE_NAME@
 Description: C Associative Array (Dictionary)
 URL: https://github.com/inorton/xrhash
-Version: @VERSION@
+Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lxrhash
 Cflags: -I${includedir} -I${includedir}/xrhash
 
