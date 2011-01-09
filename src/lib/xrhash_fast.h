@@ -1,7 +1,7 @@
 #ifndef XRHASH_FAST_H
 #define XRHASH_FAST_H
 
-#include <xrhash.h>
+#include "xrhash.h"
 
 typedef struct xrhash_fast_iterator
 {

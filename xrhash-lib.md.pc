@@ -1,5 +1,5 @@
 Name: xrhash-lib
 Description: 
 Version: 0.1
-Libs: -L/home/inb/Projects/git/xr/src/xrhash/bin/Debug -lxrhash
-Cflags: -I/home/inb/Projects/git/xr/src/xrhash/src/lib
+Libs: -L"/home/inb/Projects/git/xr/src/xrhash/bin/Debug" -lxrhash
+Cflags: -I"/home/inb/Projects/git/xr/src/xrhash/src/lib"

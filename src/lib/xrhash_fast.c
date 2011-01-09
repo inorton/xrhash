@@ -1,5 +1,5 @@
-#include <xrhash.h>
-#include <xrhash_fast.h>
+#include "xrhash.h"
+#include "xrhash_fast.h"
 
 xrhash_fast_iterator * xr_init_fasthashiterator( XRHash * xr )
 {
