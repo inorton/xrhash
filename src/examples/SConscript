@@ -1,3 +1,5 @@
 Import("env");
 
-env.Program("spacemap.c",LIBS=["xrhash","ncurses"])
+env.Program("stringdict.c",LIBS=["xrhash"])
+# env.Program("spacemap.c",LIBS=["xrhash","ncurses"])
+

@@ -4,4 +4,4 @@ env = Environment()
 env.Append(CFLAGS="-Wall -Werror")
 env.Append(CFLAGS="-g -O0")
 env.SConscript("src/lib/SConscript",exports="env");
-
+env.SConscript("src/examples/SConscript",exports="env");
